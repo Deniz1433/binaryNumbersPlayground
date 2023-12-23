@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bit Manipulation</title>
+    <style>
+    .bit {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 1px solid #000;
+        margin-right: 5px;
+        cursor: pointer;
+        text-align: center; /* Center text within the bit */
+        line-height: 20px; /* Vertically center text within the bit */
+    }
+
+    .bit.active {
+        background-color: #00f; /* Blue background for active bits */
+        color: #fff; /* White text for active bits */
+    }
+
+    .bit.inactive {
+        background-color: #eee; /* Light gray background for inactive bits */
+        color: #000; /* Black text for inactive bits */
+    }
+
+    .modes {
+        margin-top: 20px;
+    }
+	</style>
+</head>
+<body>
+
+<div id="bitContainer"></div>
+
+
+<div class="modes">
+    <label>
+        <input type="radio" name="mode" value="unsigned" checked> Unsigned
+    </label>
+    <label>
+        <input type="radio" name="mode" value="signbit"> Sign Bit
+    </label>
+    <label>
+        <input type="radio" name="mode" value="onescomplement"> 1's Complement
+    </label>
+    <label>
+        <input type="radio" name="mode" value="twoscomplement"> 2's Complement
+    </label>
+</div>
+
+<div id="result"></div>
+
+<div>
+    <label for="bitCount">Number of Bits:</label>
+    <input type="number" id="bitCount" value="16" min="1">
+</div>
+
+<div>
+    <button id="invertBitsButton">Invert All Bits</button>
+</div>
+
+<script>
+
+	const bitCountInput = document.getElementById("bitCount");
+    let bitArray = Array.from({ length: parseInt(bitCountInput.value, 10) }, () => 0);
+
+    bitCountInput.addEventListener("input", function() {
+        const newBitCount = parseInt(this.value, 10);
+        if (newBitCount > 0) {
+            adjustBitArraySize(newBitCount);
+            updateDisplay();
+        }
+    });
+
+    function adjustBitArraySize(newSize) {
+        if (newSize > bitArray.length) {
+            // Add additional 0s for increased size
+            bitArray = [...bitArray, ...Array(newSize - bitArray.length).fill(0)];
+        } else {
+            // Truncate array for decreased size
+            bitArray = bitArray.slice(0, newSize);
+        }
+    }
+	
+    const bitContainer = document.getElementById("bitContainer");
+    const resultContainer = document.getElementById("result");
+    const modes = document.getElementsByName("mode");
+
+    function updateBit(index) {
+        bitArray[index] = 1 - bitArray[index];
+        updateDisplay();
+    }
+	
+	modes.forEach(mode => {
+        mode.addEventListener('change', updateDisplay);
+    });
+
+    function updateDisplay() {
+    bitContainer.innerHTML = "";
+    bitArray.forEach((bit, index) => {
+        const bitElement = document.createElement("div");
+        bitElement.classList.add("bit", bit ? "active" : "inactive");
+        bitElement.textContent = bit ? "1" : "0"; // Set text to "1" or "0"
+        bitElement.addEventListener("click", () => updateBit(index));
+        bitContainer.appendChild(bitElement);
+    });
+
+    const selectedMode = getSelectedMode();
+    const decimalValue = calculateDecimalValue(selectedMode);
+    resultContainer.textContent = `Decimal Value: ${decimalValue}`;
+	}
+
+    function getSelectedMode() {
+        const selectedMode = Array.from(modes).find((mode) => mode.checked).value;
+        return selectedMode;
+    }
+	
+	const invertBitsButton = document.getElementById("invertBitsButton");
+
+    invertBitsButton.addEventListener("click", function() {
+        invertAllBits();
+        updateDisplay();
+    });
+
+    function invertAllBits() {
+        bitArray = bitArray.map(bit => bit === 0 ? 1 : 0);
+    }
+
+    function calculateDecimalValue(mode) {
+    const binaryString = bitArray.join("");
+    let decimalValue = 0;
+	const signBit = bitArray.length > 0 ? bitArray[0] : 0; // Adjust for dynamic bit array size
+
+    switch (mode) {
+        case "signbit":
+            const sign = binaryString.charAt(0) === "1" ? -1 : 1;
+            decimalValue = sign * parseInt(binaryString.substring(1), 2);
+            break;
+        case "onescomplement":
+            if (binaryString.charAt(0) === "1") {
+                // Invert bits and convert to decimal for negative numbers
+                const invertedBinary = binaryString.substring(1).split('').map(bit => bit === '0' ? '1' : '0').join('');
+                decimalValue = -(parseInt(invertedBinary, 2));
+            } else {
+                // Directly convert to decimal for positive numbers
+                decimalValue = parseInt(binaryString, 2);
+            }
+            break;
+        case "twoscomplement":
+            if (binaryString.charAt(0) === "1") {
+                // Invert bits, add 1, and convert to decimal for negative numbers
+                const invertedBinary = binaryString.substring(1).split('').map(bit => bit === '0' ? '1' : '0').join('');
+                decimalValue = -(parseInt(invertedBinary, 2) + 1);
+            } else {
+                // Directly convert to decimal for positive numbers
+                decimalValue = parseInt(binaryString, 2);
+            }
+            break;
+        default:
+            // For unsigned mode, treat the binary string as an unsigned integer
+            decimalValue = parseInt(binaryString, 2);
+            break;
+    }
+
+    return decimalValue;
+}
+
+    // Initial setup
+    updateDisplay();
+</script>
+
+</body>
+</html>
