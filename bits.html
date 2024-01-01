@@ -142,7 +142,7 @@
         case "onescomplement":
             if (binaryString.charAt(0) === "1") {
                 // Invert bits and convert to decimal for negative numbers
-                const invertedBinary = binaryString.substring(1).split('').map(bit => bit === '0' ? '1' : '0').join('');
+                const invertedBinary = ~binaryString;
                 decimalValue = -(parseInt(invertedBinary, 2));
             } else {
                 // Directly convert to decimal for positive numbers
@@ -152,7 +152,7 @@
         case "twoscomplement":
             if (binaryString.charAt(0) === "1") {
                 // Invert bits, add 1, and convert to decimal for negative numbers
-                const invertedBinary = binaryString.substring(1).split('').map(bit => bit === '0' ? '1' : '0').join('');
+                const invertedBinary = ~binaryString;
                 decimalValue = -(parseInt(invertedBinary, 2) + 1);
             } else {
                 // Directly convert to decimal for positive numbers
