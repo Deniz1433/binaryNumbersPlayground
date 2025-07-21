@@ -1,238 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bit Manipulation</title>
-    <style>
-    .bit {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 1px solid #000;
-        margin-right: 5px;
-        cursor: pointer;
-        text-align: center; /* Center text within the bit */
-        line-height: 20px; /* Vertically center text within the bit */
-    }
-
-    .bit.active {
-        background-color: #00f; /* Blue background for active bits */
-        color: #fff; /* White text for active bits */
-    }
-
-    .bit.inactive {
-        background-color: #eee; /* Light gray background for inactive bits */
-        color: #000; /* Black text for inactive bits */
-    }
-
-    .modes {
-        margin-top: 20px;
-    }
-	</style>
-	<link rel="stylesheet" href="bits.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bit Manipulation</title>
+  <link rel="stylesheet" href="bits.css">
 </head>
 <body>
 
-<div id="bitContainer"></div>
+  <!-- Bit display -->
+  <div id="bitContainer"></div>
 
+  <!-- Mode selection -->
+  <div class="modes">
+    <label><input type="radio" name="mode" value="unsigned" checked> Unsigned</label>
+    <label><input type="radio" name="mode" value="signbit"> Sign Bit</label>
+    <label><input type="radio" name="mode" value="onescomplement"> 1's Complement</label>
+    <label><input type="radio" name="mode" value="twoscomplement"> 2's Complement</label>
+  </div>
 
-<div class="modes">
-    <label>
-        <input type="radio" name="mode" value="unsigned" checked> Unsigned
-    </label>
-    <label>
-        <input type="radio" name="mode" value="signbit"> Sign Bit
-    </label>
-    <label>
-        <input type="radio" name="mode" value="onescomplement"> 1's Complement
-    </label>
-    <label>
-        <input type="radio" name="mode" value="twoscomplement"> 2's Complement
-    </label>
-</div>
+  <!-- Decimal result -->
+  <div id="result"></div>
 
-<div id="result"></div>
-
-<div>
+  <!-- Number of bits control -->
+  <div class="controls">
     <label for="bitCount">Number of Bits:</label>
     <input type="number" id="bitCount" value="16" min="1">
-</div>
+  </div>
 
-<div>
+  <!-- Show powers of two toggle -->
+  <div class="controls">
     <label>
-        <input type="checkbox" id="showPowersOfTwo"> Show Powers of Two
+      <input type="checkbox" id="showPowersOfTwo"> Show Powers of Two
     </label>
-</div>
+  </div>
 
-<div>
-	<button id="invertBitsButton">Invert All Bits</button>
-</div>
+  <!-- Action buttons -->
+  <div class="controls">
+    <button id="resetBitsButton">Reset All Bits</button>
+    <button id="invertBitsButton">Invert All Bits</button>
+  </div>
 
+  <script>
+    const bitCountInput = document.getElementById("bitCount");
+    let bitArray = Array.from({ length: parseInt(bitCountInput.value, 10) }, () => 0);
 
-<script>
+    const bitContainer = document.getElementById("bitContainer");
+    const resultContainer = document.getElementById("result");
+    const modes = document.getElementsByName("mode");
+    const showPowersOfTwoCheckbox = document.getElementById("showPowersOfTwo");
+    const invertBitsButton = document.getElementById("invertBitsButton");
+    const resetBitsButton = document.getElementById("resetBitsButton");
 
-	const bitCountInput = document.getElementById("bitCount");
-	let bitArray = Array.from({ length: parseInt(bitCountInput.value, 10) }, () => 0);
+    bitCountInput.addEventListener("input", function () {
+      const newBitCount = parseInt(this.value, 10);
+      if (newBitCount > 0) {
+        adjustBitArraySize(newBitCount);
+        updateDisplay();
+      }
+    });
 
-	const bitContainer = document.getElementById("bitContainer");
-	const resultContainer = document.getElementById("result");
-	const modes = document.getElementsByName("mode");
-	const showPowersOfTwoCheckbox = document.getElementById("showPowersOfTwo");
-	const invertBitsButton = document.getElementById("invertBitsButton");
+    showPowersOfTwoCheckbox.addEventListener("change", updateDisplay);
 
-	bitCountInput.addEventListener("input", function () {
-		const newBitCount = parseInt(this.value, 10);
-		if (newBitCount > 0) {
-			adjustBitArraySize(newBitCount);
-			updateDisplay();
-		}
-	});
+    invertBitsButton.addEventListener("click", function () {
+      invertAllBits();
+      updateDisplay();
+    });
 
-	showPowersOfTwoCheckbox.addEventListener("change", updateDisplay);
+    resetBitsButton.addEventListener("click", function () {
+      resetAllBits();
+      updateDisplay();
+    });
 
-	invertBitsButton.addEventListener("click", function () {
-		invertAllBits();
-		updateDisplay();
-	});
+    modes.forEach((mode) => {
+      mode.addEventListener("change", updateDisplay);
+    });
 
-	modes.forEach((mode) => {
-		mode.addEventListener("change", updateDisplay);
-	});
+    function adjustBitArraySize(newSize) {
+      if (newSize > bitArray.length) {
+        bitArray = [...bitArray, ...Array(newSize - bitArray.length).fill(0)];
+      } else {
+        bitArray = bitArray.slice(0, newSize);
+      }
+    }
 
-	function adjustBitArraySize(newSize) {
-		if (newSize > bitArray.length) {
-			// Add additional 0s for increased size
-			bitArray = [...bitArray, ...Array(newSize - bitArray.length).fill(0)];
-		} else {
-			// Truncate array for decreased size
-			bitArray = bitArray.slice(0, newSize);
-		}
-	}
+    function updateBit(index) {
+      bitArray[index] = 1 - bitArray[index];
+      updateDisplay();
+    }
 
-	function updateBit(index) {
-		bitArray[index] = 1 - bitArray[index];
-		updateDisplay();
-	}
+    function resetAllBits() {
+      bitArray = bitArray.map(() => 0);
+    }
 
-	function invertAllBits() {
-		bitArray = bitArray.map((bit) => (bit === 0 ? 1 : 0));
-	}
+    function invertAllBits() {
+      bitArray = bitArray.map((bit) => (bit === 0 ? 1 : 0));
+    }
 
-	function calculateDecimalValue(mode) {
-		const binaryString = bitArray.join("");
-		let decimalValue = 0;
+    function calculateDecimalValue(mode) {
+      const binaryString = bitArray.join("");
+      let decimalValue = 0;
 
-		switch (mode) {
-			case "signbit":
-				const sign = binaryString.charAt(0) === "1" ? -1 : 1;
-				decimalValue = sign * parseInt(binaryString.substring(1), 2);
-				break;
-			case "onescomplement":
-				if (binaryString.charAt(0) === "1") {
-					const invertedBinary = binaryString
-						.substring(1)
-						.split("")
-						.map((bit) => (bit === "0" ? "1" : "0"))
-						.join("");
-					decimalValue = -(parseInt(invertedBinary, 2));
-				} else {
-					decimalValue = parseInt(binaryString, 2);
-				}
-				break;
-			case "twoscomplement":
-				if (binaryString.charAt(0) === "1") {
-					const invertedBinary = binaryString
-						.substring(1)
-						.split("")
-						.map((bit) => (bit === "0" ? "1" : "0"))
-						.join("");
-					decimalValue = -(parseInt(invertedBinary, 2) + 1);
-				} else {
-					decimalValue = parseInt(binaryString, 2);
-				}
-				break;
-			default:
-				decimalValue = parseInt(binaryString, 2);
-				break;
-		}
+      switch (mode) {
+        case "signbit":
+          const sign = binaryString.charAt(0) === "1" ? -1 : 1;
+          decimalValue = sign * parseInt(binaryString.substring(1), 2);
+          break;
+        case "onescomplement":
+          if (binaryString.charAt(0) === "1") {
+            const invertedBinary = binaryString
+              .substring(1)
+              .split("")
+              .map((b) => (b === "0" ? "1" : "0"))
+              .join("");
+            decimalValue = -parseInt(invertedBinary, 2);
+          } else {
+            decimalValue = parseInt(binaryString, 2);
+          }
+          break;
+        case "twoscomplement":
+          if (binaryString.charAt(0) === "1") {
+            const invertedBinary = binaryString
+              .substring(1)
+              .split("")
+              .map((b) => (b === "0" ? "1" : "0"))
+              .join("");
+            decimalValue = -(parseInt(invertedBinary, 2) + 1);
+          } else {
+            decimalValue = parseInt(binaryString, 2);
+          }
+          break;
+        default:
+          decimalValue = parseInt(binaryString, 2);
+      }
 
-		return decimalValue;
-	}
+      return decimalValue;
+    }
 
-	function getSelectedMode() {
-		const selectedMode = Array.from(modes).find((mode) => mode.checked).value;
-		return selectedMode;
-	}
+    function getSelectedMode() {
+      return Array.from(modes).find((mode) => mode.checked).value;
+    }
 
-	function updateDisplay() {
-		bitContainer.innerHTML = "";
+    function updateDisplay() {
+      bitContainer.innerHTML = "";
 
-		bitArray.forEach((bit, index) => {
-			const bitWrapper = document.createElement("div");
-			bitWrapper.style.position = "relative";
-			bitWrapper.style.display = "inline-block";
+      bitArray.forEach((bit, index) => {
+        const bitWrapper = document.createElement("div");
+        bitWrapper.style.position = "relative";
+        bitWrapper.style.display = "inline-block";
 
-			// Create the bit element
-			const bitElement = document.createElement("div");
-			bitElement.classList.add("bit", bit ? "active" : "inactive");
-			bitElement.textContent = bit ? "1" : "0";
-			bitElement.addEventListener("click", () => updateBit(index));
-			bitWrapper.appendChild(bitElement);
+        const bitElement = document.createElement("div");
+        bitElement.classList.add("bit", bit ? "active" : "inactive");
+        bitElement.textContent = bit ? "1" : "0";
+        bitElement.addEventListener("click", () => updateBit(index));
+        bitWrapper.appendChild(bitElement);
 
-			// Add the power of two if the checkbox is checked
-			if (showPowersOfTwoCheckbox.checked) {
-				const powerOfTwo = document.createElement("div");
-				const powerValue = 2 ** (bitArray.length - 1 - index);
+        if (showPowersOfTwoCheckbox.checked) {
+          const powerOfTwo = document.createElement("div");
+          const powerValue = 2 ** (bitArray.length - 1 - index);
 
-				powerOfTwo.textContent = `2^${bitArray.length - 1 - index}`;
-				powerOfTwo.style.position = "absolute";
-				powerOfTwo.style.top = "-35px";
-				powerOfTwo.style.left = "50%";
-				powerOfTwo.style.transform = "translateX(-50%)";
-				powerOfTwo.style.fontSize = "12px";
-				powerOfTwo.style.color = "#555";
+          powerOfTwo.textContent = `2^${bitArray.length - 1 - index}`;
+          powerOfTwo.style.position = "absolute";
+          powerOfTwo.style.top = "-20px";
+          powerOfTwo.style.left = "50%";
+          powerOfTwo.style.transform = "translateX(-50%)";
+          powerOfTwo.style.fontSize = "12px";
+          powerOfTwo.style.color = "#555";
 
-				// Add tooltip functionality
-				const tooltip = document.createElement("div");
-				tooltip.textContent = powerValue.toLocaleString(); // Format value with commas
-				tooltip.style.position = "absolute";
-				tooltip.style.top = "-60px";
-				tooltip.style.left = "50%";
-				tooltip.style.transform = "translateX(-50%)";
-				tooltip.style.padding = "5px";
-				tooltip.style.backgroundColor = "#000";
-				tooltip.style.color = "#fff";
-				tooltip.style.borderRadius = "4px";
-				tooltip.style.fontSize = "10px";
-				tooltip.style.display = "none"; // Initially hidden
-				tooltip.style.zIndex = "10";
+          const tooltip = document.createElement("div");
+          tooltip.textContent = powerValue.toLocaleString();
+          tooltip.style.position = "absolute";
+          tooltip.style.top = "-60px";
+          tooltip.style.left = "50%";
+          tooltip.style.transform = "translateX(-50%)";
+          tooltip.style.padding = "5px";
+          tooltip.style.backgroundColor = "#000";
+          tooltip.style.color = "#fff";
+          tooltip.style.borderRadius = "4px";
+          tooltip.style.fontSize = "10px";
+          tooltip.style.display = "none";
+          tooltip.style.zIndex = "10";
 
-				// Show tooltip on hover
-				powerOfTwo.addEventListener("mouseenter", () => {
-					tooltip.style.display = "block";
-				});
+          powerOfTwo.addEventListener("mouseenter", () => {
+            tooltip.style.display = "block";
+          });
+          powerOfTwo.addEventListener("mouseleave", () => {
+            tooltip.style.display = "none";
+          });
 
-				powerOfTwo.addEventListener("mouseleave", () => {
-					tooltip.style.display = "none";
-				});
+          bitWrapper.appendChild(powerOfTwo);
+          bitWrapper.appendChild(tooltip);
+        }
 
-				bitWrapper.appendChild(powerOfTwo);
-				bitWrapper.appendChild(tooltip);
-			}
+        bitContainer.appendChild(bitWrapper);
+      });
 
-			bitContainer.appendChild(bitWrapper);
-		});
+      const selectedMode = getSelectedMode();
+      const decimalValue = calculateDecimalValue(selectedMode);
+      resultContainer.textContent = `Decimal Value: ${decimalValue}`;
+    }
 
-		const selectedMode = getSelectedMode();
-		const decimalValue = calculateDecimalValue(selectedMode);
-		resultContainer.textContent = `Decimal Value: ${decimalValue}`;
-	}
-
-	// Initial setup
-	updateDisplay();
-
-</script>
-
+    // Initial render
+    updateDisplay();
+  </script>
 </body>
 </html>
