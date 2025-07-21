@@ -5,12 +5,12 @@ body {
     margin: 0;
     padding: 20px;
     color: #333;
-    text-align: center; /* Center align all content */
+    text-align: center;
 }
 
 /* Bit Container Styling */
 #bitContainer {
-    display: inline-flex; /* Inline and flexible container */
+    display: inline-flex;
     flex-wrap: wrap;
     justify-content: center;
     margin: 20px auto;
@@ -19,12 +19,16 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     max-width: 90%;
-    min-width: fit-content; /* Dynamically fit content */
-    height: auto; /* Dynamically adjust height */
-    overflow: visible; /* Allow tooltips to be fully visible */
-    position: relative; /* Ensure correct stacking context */
+    min-width: fit-content;
+    height: auto;
+    overflow: visible;
+    position: relative;
 }
 
+/* Extra top padding when “Show Powers of Two” is checked */
+body:has(#showPowersOfTwo:checked) #bitContainer {
+    padding-top: 35px;
+}
 
 /* Individual Bit Styling */
 .bit {
@@ -41,20 +45,17 @@ body {
     font-weight: bold;
     transition: background-color 0.3s, transform 0.2s;
 }
-
 .bit.active {
     background-color: #007bff;
     color: #fff;
     box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
     transform: translateY(-2px);
 }
-
 .bit.inactive {
     background-color: #f9f9f9;
     color: #666;
     border: 1px solid #ddd;
 }
-
 .bit:hover {
     border-color: #007bff;
     transform: translateY(-2px);
@@ -66,13 +67,11 @@ body {
     justify-content: center;
     margin-top: 20px;
 }
-
 .modes label {
     margin: 0 10px;
     font-size: 16px;
     cursor: pointer;
 }
-
 .modes input {
     margin-right: 5px;
 }
@@ -86,13 +85,16 @@ body {
     color: #555;
 }
 
-/* Input and Button Section */
-div {
+/* Input/Button Rows */
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     margin-top: 20px;
 }
 
+/* Bit count input styling */
 #bitCount {
-    display: inline-block;
     margin-left: 10px;
     width: 80px;
     padding: 5px;
@@ -102,22 +104,13 @@ div {
     border: 1px solid #ccc;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 label[for="bitCount"] {
     font-size: 18px;
     font-weight: bold;
 }
 
-/* Center align the input and button section */
-div:nth-child(3),
-div:nth-child(4) {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
+/* Button styling */
 button {
-    display: inline-block;
     margin-left: 10px;
     padding: 10px 20px;
     font-size: 16px;
@@ -130,29 +123,24 @@ button {
     transition: background-color 0.3s, transform 0.2s;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
 button:hover {
     background-color: #218838;
     transform: scale(1.05);
 }
-
 button:active {
     transform: scale(0.95);
 }
 
-/* Responsive Design */
 @media (max-width: 600px) {
     #bitContainer {
         max-width: 100%;
     }
-
     .bit {
         width: 30px;
         height: 30px;
         font-size: 14px;
         line-height: 30px;
     }
-
     button {
         padding: 8px 16px;
         font-size: 14px;
@@ -164,7 +152,6 @@ button:active {
     position: relative;
     display: inline-block;
 }
-
 .bit-wrapper div {
     position: absolute;
     top: -20px;
@@ -172,7 +159,5 @@ button:active {
     transform: translateX(-50%);
     font-size: 12px;
     color: #555;
-    pointer-events: none; /* Prevent interaction with the superscripts */
+    pointer-events: none;
 }
-
-
